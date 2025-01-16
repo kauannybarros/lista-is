@@ -1,0 +1,85 @@
+#include <stdio.h> 
+#include <pthread.h> 
+#include <unistd.h> //Para usar sleep
+#define T 8 //Quantidade de carro por direção (são duas)
+#define N 4 //Máximo de carro na ponte 
+
+int carros_na_ponte = 0; //Variável de controle - Não ultrapassar a quantidade máximas de carro na ponte e ponte vazia
+int direc_atual = 1; //Vai servir como parametro para comparar a direcao do carro. - Inicializando com os carros da direcao 1 
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t lock = PTHREAD_COND_INITIALIZER; //Essa variável de condição será utilizada para indicar quando a ponte estiver em sua capacidade máxima ou travar que carros de direção oposta ocupem a ponte
+
+void entrar_ponte(int direcao_carro){
+    pthread_mutex_lock(&mutex);
+
+    printf("Carro da direcao %d aguarda pra entrar na ponte\n", direcao_carro);
+
+    //Garantindo que não vai haver mais carros que a capacidade máxima da ponte e que carros com direção oposta não estarõa na ponte.
+    while(carros_na_ponte == N || direcao_carro != direc_atual) {
+        pthread_cond_wait(&lock, &mutex);
+    }
+
+    carros_na_ponte++; //Carro entrou na ponte 
+    printf("Carro da direcao %d entrou na ponte\n", direcao_carro);
+    printf("%d carros na ponte\n", carros_na_ponte);
+
+    pthread_mutex_unlock(&mutex);
+}
+
+void sair_ponte(int direcao_carro){
+    pthread_mutex_lock(&mutex);
+
+    carros_na_ponte--; //Carro saiu da ponte 
+    printf("Carro da direcao %d saiu da ponte\n", direcao_carro);
+    printf("%d carros na ponte\n", carros_na_ponte);
+
+    pthread_mutex_unlock(&mutex);
+}
+
+void mover(int direcao_carro){
+    entrar_ponte(direcao_carro);
+    sleep(3); //Simulando o tempo que o carro passa na ponte 
+    sair_ponte(direcao_carro);
+}
+
+void *troca_direcao_tempo(void *arg) {
+    while (1) {
+        sleep(4); //Aguarda 4 segundos antes de tentar trocar a direção - esse é o tempo que os cada direção possui antes de alternar
+        pthread_mutex_lock(&mutex); 
+
+        if (carros_na_ponte == 0) {
+            direc_atual = (-1)*direc_atual; //Alterna a direção
+            printf("Troca de direção. Direção atual: %d\n", direc_atual);
+            pthread_cond_broadcast(&lock); //Acorda as threads que estavam esperando
+        }
+
+        pthread_mutex_unlock(&mutex);
+    }
+    return NULL;
+}
+
+int main(){
+    pthread_t carros[2*T], troca_direcao;
+    
+  
+    pthread_create(&troca_direcao, NULL, troca_direcao_tempo, NULL); //Criando a thread que fica responsável pela troca periódica de direção
+    //Troca necessária para que possa priorizar de forma justa os veículos de ambas as direções, proporcionando uma fatia de tempo igual
+
+    for(int i = 0; i < T; i++){  //Criando as threads dos carros - Uma thread, Um carro; 
+        pthread_create(&carros[i], NULL, (void*)mover, (void*)-1); //Criando thread dos carros e definindo direção -1
+        pthread_create(&carros[T+i], NULL, (void*)mover, (void*)1); //Carros na direção 1
+    }
+
+    for(int i = 0; i < 2*T; i++){    //Garantindo que todas as threads irão terminar antes que o programa encerre
+        pthread_join(carros[i], NULL);
+    }
+
+    //Cancela a thread de troca periódica - 
+    pthread_cancel(troca_direcao);
+    pthread_join(troca_direcao, NULL); //Garantindo que vai a thread vai terminar.
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&lock);
+
+    return 0; 
+}
