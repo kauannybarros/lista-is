@@ -22,7 +22,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //inicializa o tabuleiro a partir de um arquivo exemplo
 void inicializar_tabuleiro(char *nome_arquivo) {
-    FILE *arquivo = fopen("q3-aux.txt", "r");
+    FILE *arquivo = fopen("q2_aux.txt", "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo %s. Certifique-se de que ele existe.\n", nome_arquivo);
         exit(1);
