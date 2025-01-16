@@ -1,5 +1,5 @@
 /*
-Como dito no enunciado: o código abrirá um jogo base de um arquivo q2-aux.txt e usará pthreads para verificar quem ganhou no caso exemplo.
+Como dito no enunciado: o código abrirá um jogo base de um arquivo q3-aux.txt e usará pthreads para verificar quem ganhou no caso exemplo.
 
 Após isso, será perguntado ao jogador se ele quer jogar de interativa. Caso [y], o jogador segue para um jogo da velha convencional. Caso [n], o programa encerra o jogo.
 
@@ -110,6 +110,17 @@ void checa_ganhou() {
     }
 }
 
+//limpa o tabuleiro antes da parte interativa
+void limpa_tabuleiro() {
+    for (int i = 0; i < N; i++) {
+        for(int j = 0; j < N; j++) {
+            tabuleiro[i][j] = ' '; //limpa cada célula
+        }
+    }
+    jogadas = 0;
+    vencedor = 0;
+}
+
 //pede a entrada aos jogadores
 void jogando(int jogador) {
     int linha, coluna;
@@ -145,6 +156,7 @@ int main() {
     scanf(" %c", &continuar);
 
     if (continuar == 'y' || continuar == 'Y') {
+        limpa_tabuleiro();
         int jogador_da_vez = (jogadas % 2 == 0) ? 1 : 2;
         while (vencedor == 0 && jogadas < N * N) {
             mostra_tabuleiro();
