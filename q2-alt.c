@@ -1,5 +1,5 @@
 /*
-Como dito no enunciado: o código abrirá um jogo base de um arquivo q3-aux.txt e usará pthreads para verificar quem ganhou no caso exemplo.
+Como dito no enunciado: o código abrirá um jogo base de um arquivo q2-aux.txt e usará pthreads para verificar quem ganhou no caso exemplo.
 
 Após isso, será perguntado ao jogador se ele quer jogar de interativa. Caso [y], o jogador segue para um jogo da velha convencional. Caso [n], o programa encerra o jogo.
 
