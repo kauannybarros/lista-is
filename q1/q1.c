@@ -29,7 +29,7 @@ int busca_palavra(void *arg)
         numeroatual++;               // se nao achou na linha 1, vai na 2 etc...
         if (strstr(linhas, palavra)) // quando achar printa o nome e o numero atual do arquivo
         {                            // Verifica se a palavra está na linha
-            printf("<%s>:<%d>\n", nome_arquivo, numeroatual);
+            printf("<%s>: (%d)\n", nome_arquivo, numeroatual);
         }
     }
 
@@ -42,13 +42,13 @@ int main(int argc, char const *argv[])
     int quantidade = 10;
     thrd_t threads[quantidade];
     dadostread dados[quantidade];
-    char palavra[5] = "cavalo"; // modifique esse nome caso queria procurar outra palavra
+    char palavra[10] = "cavalo"; // modifique esse nome caso queria procurar outra palavra
 
     // Array de nomes de arquivos
-    // caso queira mais casos testes aumente o valor do vetor bem como adpte os nomes dos arquivos
+    // caso queira mais casos testes aumente o valor do vetor bem como adapte os nomes dos arquivos
     const char *nomearquivos[11] = {
         "arquivo_1.txt", "arquivo_2.txt", "arquivo_3.txt", "arquivo_4.txt", "arquivo_5.txt",
-        "arquivo_6.txt", "arquivo_7.txt", "arquivo_8.txt", "arquivo_9.txt", "arquivo_10.txt", "arquivo_11.txt"};
+        "arquivo_6.txt", "arquivo_7.txt", "arquivo_8.txt", "arquivo_9.txt", "arquivo_10.txt"};
     // for de criação das trheads
     for (int i = 0; i < quantidade; i++)
     { // estou passando aq a palavra que vai buscar para o dado da tread especifica, bem como o nome do seu arquivo em especifico
