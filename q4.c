@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 
 typedef struct elem
 {
@@ -153,19 +154,28 @@ void *consumer(void *args)
 int main(int argc, char const *argv[])
 {
     int filas = 0; // Define a quantidade de filas
-    printf("Quantas filas deseja criar?");
-    scanf("%d", &filas);
+    printf("Quantas filas deseja criar? ");
+    while(1) {
+        scanf("%d", &filas);
+        if(filas > 0) {
+            break;
+        }
+        else {
+            printf("Quantidade de filas deve ser maior que 0. Tente novamente: ");
+        }
+    }
+    
     BlockingQueue **FILA = (BlockingQueue **)malloc(filas * sizeof(BlockingQueue *));
     for (int i = 0; i < filas; i++) // Cria as filas e define o buffer de cada uma
     {
-        printf("qual o buffer da fila %d", i);
+        printf("Qual o buffer da fila %d? ", i);
         int quantidade = 0;
         scanf("%d", &quantidade);
         FILA[i] = newBlockingQueue(quantidade, i); // Define o identificador da fila
     }
 
     int prodq = 0, consq = 0; // Define a quantidade de produtores e consumidores
-    printf("Insira a quantidade de produtores e consumidores:");
+    printf("Insira a quantidade de produtores e consumidores: ");
     scanf("%d %d", &prodq, &consq);
     // Cria os vetores de threads para produtores e consumidores
     pthread_t *prod = (pthread_t *)malloc(prodq * sizeof(pthread_t));
